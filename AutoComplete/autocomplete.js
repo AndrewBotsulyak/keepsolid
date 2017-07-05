@@ -1,4 +1,4 @@
-class SearchField{
+class Autocomplete{
 
 
 	constructor(form,arr) {
@@ -21,32 +21,23 @@ class SearchField{
 		
 
 		//    input
-		this.AddInputCallback('keyup',(event)=>this.KeyUPInput(event));
-		this.AddInputCallback('focusin',(event)=>this.DisplaySort(event));
-		
+		this.input.addEventListener('keyup', (event) => this.keyUPInput(event));
+		this.input.addEventListener('focusin', (event) => this.displaySort(event));
 		
 		// form
-		this.AddSearchFormCallback('click',(event)=>this.ClickSearchForm(event));
-
-		//document
-		document.documentElement.addEventListener('click',(event)=>this.DocumClick(event));
-
+		this.form.addEventListener('click',(event)=>this.clickSearchForm(event));
 		this.form.addEventListener('keydown',(event)=>{
 			if(event.keyCode == 13 && this.form.querySelector('.item.active'))
 				event.preventDefault();
 		});
 
+
+		//document
+		document.documentElement.addEventListener('click',(event)=>this.documClick(event));
+
 	}
 
-	AddInputCallback(eventStr,func){
-		this.input.addEventListener(eventStr,(event)=>func(event));
-	}
-
-	AddSearchFormCallback(eventStr,func){
-		this.form.addEventListener(eventStr,(event)=>func(event));
-	}
-
-	KeyControl(event){
+	keyControl(event){
 		if(event.keyCode == 40 || event.keyCode == 38){
 
 		let elem = this.form.querySelector('.item.active');
@@ -80,35 +71,35 @@ class SearchField{
 		if(event.keyCode == 13){
 			let elem = this.form.querySelector('.item.active');
 			if(elem){
-				this.DisplayItem(elem);
+				this.displayItem(elem);
 			}
 		}
 			return true;
 	}
 
-	LostFocus(event){
+	kostFocus(event){
 		let forms = document.querySelectorAll('.search-form');
 		forms.forEach((el)=>{
 				el.querySelector('.result').innerHTML = '';
 		});
 	}
 
-	KeyUPInput(event){
-		if(this.KeyControl(event))
-			this.DisplayResult(this.input.value);
+	keyUPInput(event){
+		if(this.keyControl(event))
+			this.displayResult(this.input.value);
 	}
 
-	ClickSearchForm(event){
+	clickSearchForm(event){
 
 		let elem = event.target;
-		elem =(elem.parentNode.dataset.name)? elem.parentNode:elem;
+		elem =(elem.parentNode.dataset.name)? elem.parentNode : elem;
 		if(elem.dataset.name)
 		{
-			this.DisplayItem(elem);
+			this.displayItem(elem);
 		}
 	}
 
-	DocumClick(event){
+	documClick(event){
 		let elem = event.target;
 		if(!elem.classList.contains('item') 
 			&& !elem.classList.contains('search-input') 
@@ -116,7 +107,7 @@ class SearchField{
 			this.ul.innerHTML = '';
 	}
 
-	DisplaySort(event){
+	displaySort(event){
 		let forms = document.querySelectorAll('.search-form');
 		forms.forEach((el)=>{
 				el.querySelector('.result').innerHTML = '';
@@ -124,30 +115,30 @@ class SearchField{
 		
 		if(this.input.value !== '')
 		{
-			this.DisplayResult(this.input.value);
+			this.displayResult(this.input.value);
 			return;
 		}
 		
-		this.RenderItems(this.mainArr);
+		this.renderItems(this.mainArr);
 	}
 
-	DisplayItem(elem){
+	displayItem(elem){
 		this.input.value = elem.dataset.name;
 		this.ul.innerHTML = '';
 		setTimeout(()=>alert(this.input.value),10);
 	}
 
-	RenderItems(arr){
+	renderItems(arr){
 		this.ul.innerHTML = arr.join('');
 	}
 
-	DisplayResult(value){
-		let matches = this.FindMatch(value,this.copyArr);
+	displayResult(value){
+		let matches = this.findMatch(value,this.copyArr);
 		let reg = new RegExp(value, 'gi');
 		let max = 5, count = 0;
 		let arr;
 		if(value === ''){
-			this.DisplaySort();
+			this.displaySort();
 			max = matches.length;
 			return;
 		}
@@ -160,7 +151,13 @@ class SearchField{
 			this.input.classList.remove('nofind');
 		}
 
-		arr = matches.map((country)=>{
+		arr = this.makeDOMList(matches, reg, value, count, max);
+
+		this.renderItems(arr);
+	}
+
+	makeDOMList(matchesArr, reg, value, count, max){
+		return matchesArr.map((country)=>{
 
 			if(count < max)
 				count++;
@@ -174,11 +171,9 @@ class SearchField{
 				</li>
 			`;
 		});
-
-		this.RenderItems(arr);
 	}
 
-	FindMatch(search,arr){
+	findMatch(search,arr){
 		search = search.toLowerCase();
 		return arr.filter((item)=>{
 			return item.toLowerCase().includes(search);
