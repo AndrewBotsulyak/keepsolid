@@ -8,9 +8,7 @@ class Autocomplete{
 		this.items = form.querySelectorAll('.item');
 		this.copyArr = arr.slice();
 		this.mainArr =	arr.slice();
-		this.mainArr.sort((a,b)=>{
-			return a.toLowerCase().localeCompare(b.toLowerCase());
-		});
+		this.mainArr.sort((a,b)=> a.toLowerCase().localeCompare(b.toLowerCase()));
 		this.mainArr = this.mainArr.map((el)=>{
 			return `
 				<li class="item" data-name='${el}'>
@@ -18,19 +16,17 @@ class Autocomplete{
 				</li>
 			`;
 		});
-		
 
 		//    input
 		this.input.addEventListener('keyup', (event) => this.keyUPInput(event));
 		this.input.addEventListener('focusin', (event) => this.displaySort(event));
-		
+
 		// form
 		this.form.addEventListener('click',(event)=>this.clickSearchForm(event));
 		this.form.addEventListener('keydown',(event)=>{
 			if(event.keyCode == 13 && this.form.querySelector('.item.active'))
 				event.preventDefault();
 		});
-
 
 		//document
 		document.documentElement.addEventListener('click',(event)=>this.documClick(event));
@@ -53,16 +49,12 @@ class Autocomplete{
 		next = elem.nextElementSibling;
 
 		if(event.keyCode == 38){
-			if(prev)
-				prev.classList.toggle('active');
-			else
-				return false;
+			if(prev) prev.classList.toggle('active');
+			else return false;
 		}
 		else{
-			if(next)
-				next.classList.toggle('active');
-			else
-				return false;
+			if(next) next.classList.toggle('active');
+			else return false;
 		}
 		elem.classList.toggle('active');
 		return false;
@@ -77,16 +69,13 @@ class Autocomplete{
 			return true;
 	}
 
-	kostFocus(event){
+	lostFocus(event){
 		let forms = document.querySelectorAll('.search-form');
-		forms.forEach((el)=>{
-				el.querySelector('.result').innerHTML = '';
-		});
+		forms.forEach((el)=> el.querySelector('.result').innerHTML = '');
 	}
 
 	keyUPInput(event){
-		if(this.keyControl(event))
-			this.displayResult(this.input.value);
+		if(this.keyControl(event)) this.displayResult(this.input.value);
 	}
 
 	clickSearchForm(event){
@@ -109,9 +98,7 @@ class Autocomplete{
 
 	displaySort(event){
 		let forms = document.querySelectorAll('.search-form');
-		forms.forEach((el)=>{
-				el.querySelector('.result').innerHTML = '';
-		});
+		forms.forEach((el)=> el.querySelector('.result').innerHTML = '');
 		
 		if(this.input.value !== '')
 		{
@@ -151,18 +138,15 @@ class Autocomplete{
 			this.input.classList.remove('nofind');
 		}
 
-		arr = this.makeDOMList(matches, reg, value, count, max);
+		arr = this.makeDOMList(matches, reg, value);
 
 		this.renderItems(arr);
 	}
 
-	makeDOMList(matchesArr, reg, value, count, max){
+	makeDOMList(matchesArr, reg, value, count = 0, max = 5){
 		return matchesArr.map((country)=>{
-
-			if(count < max)
-				count++;
-			else
-				return;
+			if(count < max) count++;
+			else return;
 
 			let str = country.replace(reg,`<span class='w-style'>${value.toLowerCase()}</span>`);
 			return `
@@ -175,9 +159,7 @@ class Autocomplete{
 
 	findMatch(search,arr){
 		search = search.toLowerCase();
-		return arr.filter((item)=>{
-			return item.toLowerCase().includes(search);
-		});
+		return arr.filter((item)=> item.toLowerCase().includes(search));
 	}
 
 }
