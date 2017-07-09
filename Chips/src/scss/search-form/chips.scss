@@ -1,0 +1,55 @@
+.chips{
+
+    &:after{
+    	content: ' ';
+    	display: table;
+    	clear:both;
+    }
+}
+
+.chips-item{
+    width: auto;
+    height: 40px;
+    float: left;
+    margin: 3px;
+    padding: 0 5px 0 10px;
+    background-color: #25f9b6;
+    cursor: pointer;
+    border-radius:10px;
+    box-sizing: border-box;
+    
+    &:hover{
+    	background-color: rgba(255,255,255, .5);
+    	border: 1px solid #25f9b6;
+    	padding: 0 4px 0 9px;
+    }
+   
+}
+
+.chips-item--name{
+	float:left;
+	line-height: 40px;
+	font-size: 14px;
+	transition: .3s ease;
+	font-family: 'Indie Flower';
+	font-weight: bold;
+}
+
+.chips-item--close{
+	float:left;
+	height: 100%;
+	width: 20px;
+	text-align: center;
+	line-height: 40px;
+	font-size: 28px;
+	font-weight: bold;
+	transition: .3s ease;
+
+	&:hover{
+		transform: rotate(90deg);
+	}
+}
+
+.chips-result{
+
+}

@@ -1,4 +1,17 @@
-class Autocomplete{
+
+/*
+Class represents form with autocomplete option.
+@param {HTMLElement} form - DOM Element (form with input).
+@param {Array} arr - Array with information.
+@property {HTMLElement} form - form.
+@property {HTMLElement} input - form's input.
+@property {HTMLElement} ul - form's ul with all matches.
+@property {HTMLElement} items - ul's items.
+@property {Array} copyArr - array for showing current result of search.
+@readonly
+@property {Array} mainArr - array with all information.
+*/
+export default class Autocomplete{
 
 
 	constructor(form,arr) {
@@ -80,10 +93,8 @@ class Autocomplete{
 	}
 
 	clickSearchForm(event){
-
 		let elem = event.target;
-		elem =(elem.parentNode.dataset.name)? elem.parentNode : elem;
-		if(elem.dataset.name)
+		if(elem.classList.contains('item'))
 		{
 			this.displayItem(elem);
 		}
