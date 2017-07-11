@@ -20,7 +20,6 @@ Class represents form with autocomplete option.
 @readonly
 @property {Array} mainArr - array with all information.
 */
-
 export default class Autocomplete{
 
 
@@ -128,7 +127,7 @@ export default class Autocomplete{
 	}
 
 	clickSearchForm(event){
-
+		console.log(event);
 		let elem = event.target;
 		if(elem.classList.contains('item') && elem.dataset.name)
 		{

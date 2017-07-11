@@ -26,7 +26,7 @@ fetch('https://crossorigin.me/http://country.io/names.json')
 	})
 	.then(arr =>{
 
-		obj1 = new Chips(form1, arr);
+		obj1 = new Chips(form1, arr, { repeat: true });
 		obj2 = new Chips(form2, arr);
 	})
 	.catch((error) => console.log(`"country request". ${error.message}`));

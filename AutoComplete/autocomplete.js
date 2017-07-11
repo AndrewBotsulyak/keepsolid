@@ -1,15 +1,42 @@
+const defaultOptions = { 
+	onSelectItem: function(event) {  //callback function, call on item select
+		alert(this.input.value);
+	},
+	maxMatches: 5,
+	sort: 'ASC'
+}
+
+
+/*
+Class represents form with autocomplete option.
+@param {HTMLElement} form - DOM Element (form with input).
+@param {Array} arr - Array with information.
+@param {Object} options - obj with user settings.
+@property {HTMLElement} form - form.
+@property {HTMLElement} input - form's input.
+@property {HTMLElement} ul - form's ul with all matches.
+@property {HTMLElement} items - ul's items.
+@property {Array} copyArr - array for showing current result of search.
+@readonly
+@property {Array} mainArr - array with all information.
+*/
+
 class Autocomplete{
 
 
-	constructor(form,arr) {
+	constructor(form, arr, options) {
 		this.form = form;
 		this.input = form.querySelector('.search-input');
 		this.ul = form.querySelector('.result');
 		this.items = form.querySelectorAll('.item');
-		this.copyArr = arr.slice();
 		this.mainArr =	arr.slice();
-		this.copyArr.sort((a,b)=> a.toLowerCase().localeCompare(b.toLowerCase()));
-		this.mainArr.sort((a,b)=> a.toLowerCase().localeCompare(b.toLowerCase()));
+		this.options = Object.assign({}, defaultOptions, options);
+
+		this.onSelectItem = this.options.onSelectItem; 				//callback function, call on item select
+
+		this.sortData(this.options.sort); 
+
+		this.copyArr = this.mainArr.map(el => el);
 		this.mainArr = this.mainArr.map((el)=>{
 			return `
 				<li class="item" data-name='${el}'>
@@ -64,10 +91,31 @@ class Autocomplete{
 		if(event.keyCode == 13){
 			let elem = this.form.querySelector('.item.active');
 			if(elem){
-				this.displayItem(elem);
+				
+				const event2 = Object.assign({}, event, {target: elem });
+				this.selectItem(elem);
+				this.onSelectItem(event2);
+
 			}
 		}
 			return true;
+	}
+
+	selectItem(elem){
+		this.input.value = elem.dataset.name;
+	}
+
+	sortData(key){
+		switch(key){
+			case 'ASC':
+				this.mainArr.sort((a,b)=> a.toLowerCase().localeCompare(b.toLowerCase()));	
+				break;
+			case 'DESC':
+				this.mainArr.sort((a,b)=> -a.toLowerCase().localeCompare(b.toLowerCase())); // reverse	
+				break;
+			default:
+			 	break;
+		}
 	}
 
 	lostFocus(event){
@@ -82,10 +130,10 @@ class Autocomplete{
 	clickSearchForm(event){
 
 		let elem = event.target;
-		elem =(elem.parentNode.dataset.name)? elem.parentNode : elem;
-		if(elem.dataset.name)
+		if(elem.classList.contains('item') && elem.dataset.name)
 		{
-			this.displayItem(elem);
+			this.selectItem(elem);
+			this.onSelectItem(event);
 		}
 	}
 
@@ -110,12 +158,6 @@ class Autocomplete{
 		this.renderItems(this.mainArr);
 	}
 
-	displayItem(elem){
-		this.input.value = elem.dataset.name;
-		this.ul.innerHTML = '';
-		setTimeout(()=>alert(this.input.value),10);
-	}
-
 	renderItems(arr){
 		this.ul.innerHTML = arr.join('');
 	}
@@ -123,11 +165,10 @@ class Autocomplete{
 	displayResult(value){
 		let matches = this.findMatch(value,this.copyArr);
 		let reg = new RegExp(value, 'gi');
-		let max = 5, count = 0;
-		let arr;
+		let count = 0, arr;
+
 		if(value === ''){
 			this.displaySort();
-			max = matches.length;
 			return;
 		}
 		if(matches.length == 0){
@@ -139,7 +180,7 @@ class Autocomplete{
 			this.input.classList.remove('nofind');
 		}
 
-		arr = this.makeDOMList(matches, reg, value);
+		arr = this.makeDOMList(matches, reg, value, count, this.options.maxMatches);
 
 		this.renderItems(arr);
 	}
@@ -160,7 +201,7 @@ class Autocomplete{
 
 	findMatch(search,arr){
 		search = search.toLowerCase();
-		return arr.filter((item)=> item.toLowerCase().includes(search));
+		return arr.filter(item => item.toLowerCase().includes(search));
 	}
 
 }

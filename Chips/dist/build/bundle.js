@@ -93,26 +93,37 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/*
-Class represents chips over Autocomplete class.
-@extends Autocomplete.
-@param {HTMLElement} form - DOM Element (form with input).
-@param {Array} arr - Array with information.
-@property {HTMLElement} chipsElem - container for all chips-item.
-@property {HTMLElement} chipsResult - string with all chips names.
-@property {Array} chipsArr - array with all chips names.
-*/
+var defaultOptions = {
+	onSelectItem: function onSelectItem(event) {
+		console.log('add new chip, value: ', event.target.dataset.name);
+	},
+	repeat: false // bool, allows to click one or more(true) times on item .
+
+
+	/*
+ Class represents chips over Autocomplete class.
+ @extends Autocomplete.
+ @param {HTMLElement} form - DOM Element (form with input).
+ @param {Array} arr - Array with information.
+ @property {HTMLElement} chipsElem - container for all chips-item.
+ @property {HTMLElement} chipsResult - string with all chips names.
+ @property {Array} chipsArr - array with all chips names.
+ */
+};
 var Chips = function (_Autocomplete) {
 	_inherits(Chips, _Autocomplete);
 
-	function Chips(form, arr) {
+	function Chips(form, arr, options) {
 		_classCallCheck(this, Chips);
 
-		var _this = _possibleConstructorReturn(this, (Chips.__proto__ || Object.getPrototypeOf(Chips)).call(this, form, arr));
+		var _this = _possibleConstructorReturn(this, (Chips.__proto__ || Object.getPrototypeOf(Chips)).call(this, form, arr, options));
 
 		_this.chipsElem = _this.form.querySelector('.chips');
 		_this.chipsResult = _this.form.querySelector('.chips-result');
 		_this.chipsArr = [];
+		_this.chipsArrElements = new Map();
+		_this.options = Object.assign({}, defaultOptions, options);
+		_this.onSelectItem = _this.options.onSelectItem; // option callback to select items    
 
 		return _this;
 	}
@@ -120,7 +131,7 @@ var Chips = function (_Autocomplete) {
 	_createClass(Chips, [{
 		key: 'addChip',
 		value: function addChip(name) {
-			if (!this.chipsArr.includes(name)) {
+			if (this.options.repeat || !this.chipsArr.includes(name)) {
 				this.chipsArr.push(name);
 				return true;
 			}
@@ -131,22 +142,46 @@ var Chips = function (_Autocomplete) {
 		value: function removeChip(chip) {
 			var name = chip.dataset.name;
 
-			this.chipsArr = this.chipsArr.filter(function (item) {
-				return item != name;
-			});
+			this.chipsArrElements.delete(chip); // delete current chip
+			this.chipsArr = []; // reset array of strings with names
+			var _iteratorNormalCompletion = true;
+			var _didIteratorError = false;
+			var _iteratorError = undefined;
+
+			try {
+				for (var _iterator = this.chipsArrElements.values()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					var value = _step.value;
+
+					this.chipsArr.push(value); // save current order for chipsResult															
+				}
+			} catch (err) {
+				_didIteratorError = true;
+				_iteratorError = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion && _iterator.return) {
+						_iterator.return();
+					}
+				} finally {
+					if (_didIteratorError) {
+						throw _iteratorError;
+					}
+				}
+			}
 
 			chip.parentNode.removeChild(chip);
 
 			this.displayChipResult(this.chipsArr);
 		}
 	}, {
-		key: 'displayItem',
-		value: function displayItem(elem) {
-			// override method
+		key: 'selectItem',
+		value: function selectItem(elem) {
+			//  default behaviour on select items.
 			var name = elem.dataset.name;
 
 			if (this.addChip(name)) {
 				var newItem = this.chipTemplate(name); // return DOM Element
+				this.chipsArrElements.set(newItem, name); // add element (Map())
 				this.chipsElem.insertBefore(newItem, this.chipsElem.lastElementChild); // add in DOM
 				this.displayChipResult(this.chipsArr);
 			}
@@ -223,20 +258,31 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/*
-Class represents form with autocomplete option.
-@param {HTMLElement} form - DOM Element (form with input).
-@param {Array} arr - Array with information.
-@property {HTMLElement} form - form.
-@property {HTMLElement} input - form's input.
-@property {HTMLElement} ul - form's ul with all matches.
-@property {HTMLElement} items - ul's items.
-@property {Array} copyArr - array for showing current result of search.
-@readonly
-@property {Array} mainArr - array with all information.
-*/
+var defaultOptions = {
+	onSelectItem: function onSelectItem(event) {
+		//callback function, call on item select
+		alert(this.input.value);
+	},
+	maxMatches: 5,
+	sort: 'ASC'
+
+	/*
+ Class represents form with autocomplete option.
+ @param {HTMLElement} form - DOM Element (form with input).
+ @param {Array} arr - Array with information.
+ @param {Object} options - obj with user settings.
+ @property {HTMLElement} form - form.
+ @property {HTMLElement} input - form's input.
+ @property {HTMLElement} ul - form's ul with all matches.
+ @property {HTMLElement} items - ul's items.
+ @property {Array} copyArr - array for showing current result of search.
+ @readonly
+ @property {Array} mainArr - array with all information.
+ */
+
+};
 var Autocomplete = function () {
-	function Autocomplete(form, arr) {
+	function Autocomplete(form, arr, options) {
 		var _this = this;
 
 		_classCallCheck(this, Autocomplete);
@@ -245,13 +291,15 @@ var Autocomplete = function () {
 		this.input = form.querySelector('.search-input');
 		this.ul = form.querySelector('.result');
 		this.items = form.querySelectorAll('.item');
-		this.copyArr = arr.slice();
 		this.mainArr = arr.slice();
-		this.copyArr.sort(function (a, b) {
-			return a.toLowerCase().localeCompare(b.toLowerCase());
-		});
-		this.mainArr.sort(function (a, b) {
-			return a.toLowerCase().localeCompare(b.toLowerCase());
+		this.options = Object.assign({}, defaultOptions, options);
+
+		this.onSelectItem = this.options.onSelectItem;
+
+		this.sortData(this.options.sort);
+
+		this.copyArr = this.mainArr.map(function (el) {
+			return el;
 		});
 		this.mainArr = this.mainArr.map(function (el) {
 			return '\n\t\t\t\t<li class="item" data-name=\'' + el + '\'>\n\t\t\t\t\t' + el + '\n\t\t\t\t</li>\n\t\t\t';
@@ -308,10 +356,36 @@ var Autocomplete = function () {
 			if (event.keyCode == 13) {
 				var _elem = this.form.querySelector('.item.active');
 				if (_elem) {
-					this.displayItem(_elem);
+
+					var event2 = Object.assign({}, event, { target: _elem });
+					this.selectItem(_elem);
+					this.onSelectItem(event2);
 				}
 			}
 			return true;
+		}
+	}, {
+		key: 'selectItem',
+		value: function selectItem(elem) {
+			this.input.value = elem.dataset.name;
+		}
+	}, {
+		key: 'sortData',
+		value: function sortData(key) {
+			switch (key) {
+				case 'ASC':
+					this.mainArr.sort(function (a, b) {
+						return a.toLowerCase().localeCompare(b.toLowerCase());
+					});
+					break;
+				case 'DESC':
+					this.mainArr.sort(function (a, b) {
+						return -a.toLowerCase().localeCompare(b.toLowerCase());
+					}); // reverse	
+					break;
+				default:
+					break;
+			}
 		}
 	}, {
 		key: 'lostFocus',
@@ -329,9 +403,11 @@ var Autocomplete = function () {
 	}, {
 		key: 'clickSearchForm',
 		value: function clickSearchForm(event) {
+
 			var elem = event.target;
-			if (elem.classList.contains('item')) {
-				this.displayItem(elem);
+			if (elem.classList.contains('item') && elem.dataset.name) {
+				this.selectItem(elem);
+				this.onSelectItem(event);
 			}
 		}
 	}, {
@@ -356,17 +432,6 @@ var Autocomplete = function () {
 			this.renderItems(this.mainArr);
 		}
 	}, {
-		key: 'displayItem',
-		value: function displayItem(elem) {
-			var _this2 = this;
-
-			this.input.value = elem.dataset.name;
-			this.ul.innerHTML = '';
-			setTimeout(function () {
-				return alert(_this2.input.value);
-			}, 10);
-		}
-	}, {
 		key: 'renderItems',
 		value: function renderItems(arr) {
 			this.ul.innerHTML = arr.join('');
@@ -376,12 +441,11 @@ var Autocomplete = function () {
 		value: function displayResult(value) {
 			var matches = this.findMatch(value, this.copyArr);
 			var reg = new RegExp(value, 'gi');
-			var max = 5,
-			    count = 0;
-			var arr = void 0;
+			var count = 0,
+			    arr = void 0;
+
 			if (value === '') {
 				this.displaySort();
-				max = matches.length;
 				return;
 			}
 			if (matches.length == 0) {
@@ -392,7 +456,7 @@ var Autocomplete = function () {
 				this.input.classList.remove('nofind');
 			}
 
-			arr = this.makeDOMList(matches, reg, value);
+			arr = this.makeDOMList(matches, reg, value, count, this.options.maxMatches);
 
 			this.renderItems(arr);
 		}
@@ -464,7 +528,7 @@ fetch('https://crossorigin.me/http://country.io/names.json').then(function (resp
 	return arrCountries;
 }).then(function (arr) {
 
-	obj1 = new _chips2.default(form1, arr);
+	obj1 = new _chips2.default(form1, arr, { repeat: true });
 	obj2 = new _chips2.default(form2, arr);
 }).catch(function (error) {
 	return console.log('"country request". ' + error.message);
