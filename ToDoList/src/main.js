@@ -1,7 +1,21 @@
-import TodoList from './js/todoList.js';
+import './scss/todo.scss';
+import './scss/todo-list/todo-list.scss';
+import './scss/todo-list/--item/todo-list--item.scss';
 
-const todo1 = new TodoList(document.querySelector('.first'));
-const todo2 = new TodoList(document.querySelector('.second'));
+import TodoBuilder from './js/todoBuilder.js'; 
+
+const container = document.querySelector('.todo-container');
+
+const build = new TodoBuilder(container);
+const todos = build.createTodos(2);
+
+
+
+
+
+
+
+
 
 
 

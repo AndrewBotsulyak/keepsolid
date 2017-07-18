@@ -1,0 +1,78 @@
+.todo-list--item{
+	position: relative;
+	 width: auto;
+	min-height: 50px; 
+	
+	box-shadow: inset 0px 0px 1px grey;
+	list-style: none;
+	display: -webkit-flex;
+	display: -moz-flex;
+	display: -ms-flex;
+	display: -o-flex;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	transition:1s ease;
+
+	& > *{
+		box-sizing: border-box;
+	}
+}
+
+.check{	
+	height: 25px;
+	width: 25px;
+	margin: 0;
+	margin-left:5px;
+	background-color: #fff;
+	order: 0;
+}
+
+.edit-input{
+	//height: 70%;
+	width: 65%;
+	top:0;
+	font-size: 22px;
+	order: 1;
+	border: none;
+    outline-offset: -2px;
+    text-align: center;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding : 5px 10px;
+	/* text-decoration: line-through; */
+}
+
+.delete{
+	width: 20px;
+    height: 20px;
+    line-height: 20px;
+	font-size: 28px;
+	text-align: center;
+	margin-right: 5px;
+	cursor: pointer;
+	border-radius: 50%;
+	order: 3;
+	transition: .2s ease;
+	user-select: none;
+
+	&:hover{
+		transform: rotate(90deg) scale(1.5) translateY(1px);
+		//background-color: #ff3700;
+	}
+}
+
+
+.edit{
+	width: 20px;
+    height: 20px;
+    background-image: url("../img/edit.svg");
+    background-size: cover;
+    order: 2;
+    cursor: pointer;
+    opacity: .5;
+	
+    &:hover{
+    	opacity: 1;
+    }
+}

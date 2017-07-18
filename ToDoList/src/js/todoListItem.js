@@ -1,41 +1,41 @@
-/*
-Class represents TodoListItem.
-@param {HTMLElement} item - DOM Element (<li>).
-
-@property {HTMLElement} item - <li>.
-@property {HTMLElement} parentElem - <ul>.
-@property {HTMLElement} input - text field.
-@property {HTMLElement} delete - delete <li>.
-@property {HTMLElement} check - checkbox inside <li>.
-*/
+/**
+ * Class represents TodoListItem.
+ * @param {HTMLElement} item - DOM Element (<li>).
+ * 
+ * @property {HTMLElement} item - <li>.
+ * @property {HTMLElement} delete - delete <li>.
+ * @property {HTMLElement} check - checkbox inside <li>.
+ * @property {HTMLElement} editElem -  btn for edit input
+ */
 export default class TodoListItem{
-	
-	constructor(item) {
-		
-		this.item = item;
-		this.parentElem = this.item.parentNode;
-		this.input = this.item.querySelector('.edit-input');
-		this.delete = this.item.querySelector('.delete');
-		this.check = this.item.querySelector('.check');
+
+	init(item){
+
+		this.itemElem = item;
+		this.input = this.itemElem.querySelector('.edit-input');
+		this.delete = this.itemElem.querySelector('.delete');
+		this.check = this.itemElem.querySelector('.check');
+		this.editElem = this.itemElem.querySelector('.edit'); 
+
 
 		// create Custom Event
-		this.closeEvent = new CustomEvent('closeItem', { cancelable: true });
+		this.closeEvent = new CustomEvent('closeItem', { bubbles: true, cancelable: true });
+
+		this.editElem.addEventListener('click', (event) => this.onEdit(event));
 
 		this.check.addEventListener('click', (event) => this.onClickCheckbox(event));
 
-		this.delete.addEventListener('click', (event) => this.onDelete(event))
-		
+		this.delete.addEventListener('click', (event) => this.onDelete(event));
 	}
 
 	onClickCheckbox(event) {
-
+		if(this.isEditable()) this.toggleEdit();
 		if(this.isChecked()){
 			this.input.style.textDecoration = 'line-through';
-			this.input.setAttribute('disabled', 'disabled');
+			this.setEditable(false);
 		}
 		else{
 			this.input.style.textDecoration = 'none';
-			this.input.removeAttribute('disabled');
 		}
 	}
 
@@ -43,26 +43,70 @@ export default class TodoListItem{
 		return this.check.checked; 
 	}
 
+	setEditable(bool){
+		if(bool){
+			this.input.contentEditable = 'true';
+		}
+		else{
+			this.input.contentEditable = 'false';
+		}
+	}
+
+	isEditable(){
+		return this.input.contentEditable === 'true';
+	}
+
+	toggleEdit(){
+		if(!this.isEditable()){
+			this.setEditable(true);
+			this.input.style.outline = 'auto 5px rgb(77, 144, 254)';
+		}
+		else {
+			this.setEditable(false);
+			this.input.style.outline = 'none';
+		} 
+	}
+
+	// click on 'this.editElem' callback
+	onEdit(event){
+		if(this.isChecked()) return;
+
+		this.toggleEdit();
+	}
+
+	// click on 'this.delete' callback, dispatch 'closeItem' event.
 	onDelete(event) {					
-		this.item.dispatchEvent(this.closeEvent); 
+		this.itemElem.dispatchEvent(this.closeEvent); 
 	}
 
-	// return DOMElement 
 	getItem() {
-		return this.item;
+		return this.itemElem;
 	}
 
+	/**
+	 * @param {Object} obj - obj with styles  
+	 */
+	setStyle(obj){
+		for(let prop in obj){
+			this.itemElem.style[prop] = obj[prop];
+		}
+	}
+
+	/**
+	 * @param {string} text - input value.
+	 */
 	setValue(text) {
-		this.input.value = text;
+		this.input.textContent = text;
 	}
 
-	static createDOMElement() {
+	createElement() {
 		const li = document.createElement('li');
 		li.classList.add('todo-list--item');
 
 		li.innerHTML = `
-			<input type="checkbox" class='check'/>
-			<input type="text" class='edit-input' />
+			<input type="checkbox" class='check' />
+			<div class="edit-input" contenteditable="false" ></div>
+			<div class="edit"></div>
 			<div class="delete">×</div>
 		`;
 		
