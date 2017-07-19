@@ -93,8 +93,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  *
  * @property {HTMLElement} containerElem - DOMElement container of TodoLists.
  * @property {Array} todosArr - array with all TodoLists.
- * @property {HTMLElement} btnBuild - btn which is added new TodoList.
- * @property {CustomEvent} addEvent - 'addtodolist' event;
+ * @property {HTMLElement} btnAddTodo - btn which is added new TodoList.
  */
 var TodoBuilder = function () {
 	function TodoBuilder(container) {
@@ -104,11 +103,9 @@ var TodoBuilder = function () {
 
 		this.containerElem = container;
 		this.todosArr = [];
-		this.btnBuild = document.querySelector('.build-todo');
+		this.btnAddTodo = document.querySelector('.build-todo');
 
-		this.addEvent = new CustomEvent('addtodolist', { bubbles: true });
-
-		this.btnBuild.addEventListener('click', function (event) {
+		this.btnAddTodo.addEventListener('click', function (event) {
 			return _this.onBuild(event);
 		});
 	}
@@ -117,7 +114,6 @@ var TodoBuilder = function () {
 		key: 'onBuild',
 		value: function onBuild(event) {
 			this.createTodo();
-			this.containerElem.dispatchEvent(this.addEvent);
 		}
 
 		/**
@@ -130,7 +126,7 @@ var TodoBuilder = function () {
 			var todo = new _todoList2.default();
 			var todoElem = todo.createElement();
 			todoElem = this.renderTodo(todoElem);
-			todo.init(todoElem);
+			todo.init(todoElem); // initialize 
 			this.todosArr.push(todo);
 			return todo;
 		}
@@ -148,7 +144,7 @@ var TodoBuilder = function () {
 
 		/**
    * @param  {Number} count - quantity of new TodoLists.
-   * @return {Array} array of elements which just have been added in DOM.
+   * @return {Array} array of elements which has just been added in DOM.
    */
 
 	}, {
