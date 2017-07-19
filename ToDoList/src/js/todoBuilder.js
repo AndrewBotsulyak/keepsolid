@@ -6,8 +6,7 @@ import TodoList from './todoList.js';
  *
  * @property {HTMLElement} containerElem - DOMElement container of TodoLists.
  * @property {Array} todosArr - array with all TodoLists.
- * @property {HTMLElement} btnBuild - btn which is added new TodoList.
- * @property {CustomEvent} addEvent - 'addtodolist' event;
+ * @property {HTMLElement} btnAddTodo - btn which is added new TodoList.
  */
 export default class TodoBuilder{
 
@@ -15,26 +14,23 @@ export default class TodoBuilder{
 
 		this.containerElem = container;
 		this.todosArr = [];
-		this.btnBuild = document.querySelector('.build-todo');
+		this.btnAddTodo = document.querySelector('.build-todo');
 
-		this.addEvent = new CustomEvent('addtodolist', { bubbles : true });
-
-		this.btnBuild.addEventListener('click', (event) => this.onBuild(event));
+		this.btnAddTodo.addEventListener('click', (event) => this.onBuild(event));
 	}
 
 	onBuild(event){
 		this.createTodo();
-		this.containerElem.dispatchEvent(this.addEvent);
 	}
 
 	/**
 	 * @return {TodoList} just created.
 	 */
 	createTodo(){
-		const todo = new TodoList();
-		let todoElem = todo.createElement();
+		const todo = new TodoList();			
+		let todoElem = todo.createElement();   
 		todoElem = this.renderTodo(todoElem);
-		todo.init(todoElem);
+		todo.init(todoElem);					// initialize 
 		this.todosArr.push(todo);
 		return todo;
 	}
@@ -49,7 +45,7 @@ export default class TodoBuilder{
 
 	/**
 	 * @param  {Number} count - quantity of new TodoLists.
-	 * @return {Array} array of elements which just have been added in DOM.
+	 * @return {Array} array of elements which has just been added in DOM.
 	 */
 	createTodos(count){
 		let arr = [];
