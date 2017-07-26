@@ -12,14 +12,36 @@ import TodoListItem from './todoListItem.js';
  */
 export default class TodoList{
 
-	init(todo){
+	constructor(todo = null, title = '', arrItems = [] ){
 
 		this.todoElem = todo;
 		this.input = this.todoElem.querySelector('.main-input');
 		this.add = this.todoElem.querySelector('.add-item');
 		this.ul = this.todoElem.querySelector('.todo-list');
 		this.clearList = this.todoElem.querySelector('.clearAll');
+		this.titleElem = this.todoElem.querySelector('.title');
+		this.deleteTodo = this.todoElem.querySelector('.delete-todo');
+
+		this.titleElem.textContent = title;
+		this.title = title;
 		this.arrItems = [];
+
+		this.parent = (() => {
+			let build = this.todoElem.parentElement;
+			while(!build.classList.contains('todo-container')){
+				build = build.parentElement;
+			}
+			return build;
+		})();
+
+		this.state = {
+			title: title,
+			arrItems
+		}
+		
+		this.deleteTodo.addEventListener('click', (event) => this.onRemove(event));
+
+		this.titleElem.addEventListener('keyup', (event) => this.onType(event));			
 
 		//	subscribe on TodoListItem's 'closeItem' event
 		this.ul.addEventListener('closeItem', (event) => this.onDeleteItem(event));  
@@ -30,18 +52,55 @@ export default class TodoList{
 
 	}
 
+	setState(newState){
+		this.state = Object.assign({}, this.state, newState);
+		this.dispStateChangeEvent();
+	}
+
+	onRemove(event){
+		let closeEvent = new CustomEvent('TodoList.remove', {
+			 	bubbles: true,
+				cancelable: true,
+				detail:{
+					item: this
+				}
+			});
+		this.todoElem.dispatchEvent(closeEvent);
+		this.parent.removeChild(this.todoElem);
+	}
+
+	onType(event){
+		this.title = this.titleElem.textContent;
+		this.setState({ title: this.title });
+	}
+
+	dispStateChangeEvent(){
+		const stateEvent = new CustomEvent('todostatechange',{
+			bubbles: true,
+			detail:{
+				item: this,
+				state: this.state
+			}
+		 });
+		 this.todoElem.dispatchEvent(stateEvent);
+	}
+
+	createFromStorage() {
+		this.state.arrItems.forEach(el => {
+			const newElem = this.ul.appendChild(TodoListItem.createElement());
+			const objItem =  new TodoListItem(newElem, el.checked, el.content);
+			this.arrItems.push(objItem);
+		});
+	}
+
 	onAddItem(event) {
 		event.preventDefault();
 		if(!this.isInputEmpty()){
-			const objItem =  new TodoListItem();
-			
-			const newElem = objItem.createElement();
-
-			objItem.init(this.ul.appendChild(newElem));
-
-			objItem.setValue(this.input.textContent);
-			
+			debugger;
+			const newElem = this.ul.appendChild(TodoListItem.createElement());
+			const objItem =  new TodoListItem(newElem, null, this.input.textContent);
 			this.arrItems.push(objItem);
+			this.setState({ arrItems: this.arrItems.map(el => el.state)});
 		}
 	}
 
@@ -59,31 +118,34 @@ export default class TodoList{
 	}
 
 	onDeleteItem(event) {
-
-		const elem = event.target;
-
-		this.ul.removeChild(elem);
-
-		this.arrItems = this.arrItems.filter(el => el.getItem() !== elem);
+		const elem = event.detail.item;
+		this.arrItems = this.arrItems.filter(el => el !== elem);
+		
+		this.setState({ arrItems: this.arrItems.map(el => el.state)});
 	}
 
 	// clear list of items
 	clearAll(event){
-		this.ul.innerHTML = '';
-		this.arrItems = [];
+		if(this.arrItems.length !== 0){
+			this.arrItems.forEach(elem => elem.remove());
+			this.arrItems = [];
+
+			this.setState({ arrItems: [] });
+		}
 	}
 
-	createElement(){
+	static createElement(){
 		const div = document.createElement('div');
 		div.classList.add('todo');
 		div.innerHTML = `
 			<form action="" class="todo-form">
+				<div class="delete-todo">×</div>
+				<div class='title' contenteditable="true"></div>
 				<div class='main-input' contenteditable="true" ></div>
 				<input type="submit" class="add-item btn" value="Add" />
 				<div class="clearAll btn">Clear</div>
 			</form>
 			<ul class="todo-list">
-
 			</ul>
 		`;
 

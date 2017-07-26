@@ -9,7 +9,7 @@
  */
 export default class TodoListItem{
 
-	init(item){
+	constructor( item = null, checked = false, content = '' ){
 
 		this.itemElem = item;
 		this.input = this.itemElem.querySelector('.edit-input');
@@ -17,18 +17,61 @@ export default class TodoListItem{
 		this.check = this.itemElem.querySelector('.check');
 		this.editElem = this.itemElem.querySelector('.edit'); 
 
+		this.parent = (() => {
+			let todo = this.itemElem.parentElement;
+			while(!todo.classList.contains('todo-list')){
+				todo = todo.parentElement;
+			}
+			return todo;
+		})();
 
+		this.state = {
+			checked: checked,
+			content
+		}
+
+		this.setValue(content);
+		this.setChecked(checked);
+		 
 		// create Custom Event
-		this.closeEvent = new CustomEvent('closeItem', { bubbles: true, cancelable: true });
+
+		this.input.addEventListener('keyup', (event) => this.onType(event));
 
 		this.editElem.addEventListener('click', (event) => this.onEdit(event));
 
-		this.check.addEventListener('click', (event) => this.onClickCheckbox(event));
+		this.check.addEventListener('click', (event) => this.ClickCheckbox(event));
 
 		this.delete.addEventListener('click', (event) => this.onDelete(event));
 	}
 
-	onClickCheckbox(event) {
+
+
+	onType(event){
+		this.setState({content: this.input.textContent});
+	}
+
+	dispStateChangeEvent(){
+		const stateEvent = new CustomEvent('todostatechange',{
+			bubbles: true,
+			detail:{
+				item: this,
+				state: this.state
+			}
+		 });
+		 this.itemElem.dispatchEvent(stateEvent);
+	}
+
+	createFromStorage(){
+		this.setValue(content);
+		this.check.checked = this.state.checked;
+	}
+
+	setState(newState){
+		this.state = Object.assign({}, this.state, newState);
+		this.dispStateChangeEvent();
+	}
+
+	ClickCheckbox(event) {
 		if(this.isEditable()) this.toggleEdit();
 		if(this.isChecked()){
 			this.input.style.textDecoration = 'line-through';
@@ -37,10 +80,25 @@ export default class TodoListItem{
 		else{
 			this.input.style.textDecoration = 'none';
 		}
+
+		this.setState({checked: this.isChecked()});
+		
+
 	}
 
 	isChecked() {
 		return this.check.checked; 
+	}
+
+	setChecked(bool){
+		this.check.checked = bool;
+		if(bool){
+			this.input.style.textDecoration = 'line-through';
+			this.setEditable(false);
+		}
+		else{
+			this.input.style.textDecoration = 'none';
+		}
 	}
 
 	setEditable(bool){
@@ -76,7 +134,20 @@ export default class TodoListItem{
 
 	// click on 'this.delete' callback, dispatch 'closeItem' event.
 	onDelete(event) {					
-		this.itemElem.dispatchEvent(this.closeEvent); 
+		let closeEvent = new CustomEvent('closeItem', {
+			 	bubbles: true,
+				cancelable: true,
+				detail:{
+					item: this
+				}
+			});
+		this.itemElem.dispatchEvent(closeEvent);
+		this.remove();  
+	}
+
+	remove(){
+		this.parent.removeChild(this.itemElem);
+		return this;
 	}
 
 	getItem() {
@@ -95,11 +166,11 @@ export default class TodoListItem{
 	/**
 	 * @param {string} text - input value.
 	 */
-	setValue(text) {
+	setValue(text = '') {
 		this.input.textContent = text;
 	}
 
-	createElement() {
+	static createElement() {
 		const li = document.createElement('li');
 		li.classList.add('todo-list--item');
 
@@ -112,7 +183,4 @@ export default class TodoListItem{
 		
 		return li;
 	}
-
-
-
 }

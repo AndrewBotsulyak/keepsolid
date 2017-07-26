@@ -4,7 +4,8 @@ body{
 }
 
 .todo-container{
-	
+	display: flex;
+	flex-wrap: wrap;
 }
 
 .build-todo{
@@ -23,12 +24,15 @@ body{
 	padding: 15px;
 	position: relative;
 	top: 0;
+	box-sizing: border-box;
 }
 
 .todo{
-	float:left;
-	margin: 10px 25px;
-	width: 400px;
+	flex: 1 0 310px;
+	align-content: flex-start;
+	margin: 5px 5px;
+	max-width: 620px;
+	height: 100%;
 	box-shadow: 3px 3px 10px grey;
 	background-color: #fff;
 }
@@ -89,6 +93,27 @@ body{
 	
 }
 
-.todo-list{
-	
+.title{
+	min-height: 25px;
+	max-height: 50px;
+	overflow: auto;
+	line-height: 25px;
+	font-size: 22px;
+	text-align: center;
+	margin-bottom: 25px;
+	border-bottom: 1px solid grey;
+}
+
+.delete-todo{
+	width: 20px;
+    height: 20px;
+    line-height: 20px;
+	font-size: 28px;
+	text-align: center;
+	margin-right: 5px;
+	cursor: pointer;
+	border-radius: 50%;
+	order: 3;
+	transition: .2s ease;
+	user-select: none;
 }

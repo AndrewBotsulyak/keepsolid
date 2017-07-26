@@ -2,6 +2,10 @@ body {
   background-color: #5941f4;
   margin: 0; }
 
+.todo-container {
+  display: flex;
+  flex-wrap: wrap; }
+
 .build-todo {
   padding: 10px;
   border-radius: 5px;
@@ -15,12 +19,15 @@ body {
   width: 100%;
   padding: 15px;
   position: relative;
-  top: 0; }
+  top: 0;
+  box-sizing: border-box; }
 
 .todo {
-  float: left;
-  margin: 10px 25px;
-  width: 400px;
+  flex: 1 0 310px;
+  align-content: flex-start;
+  margin: 5px 5px;
+  max-width: 620px;
+  height: 100%;
   box-shadow: 3px 3px 10px grey;
   background-color: #fff; }
 
@@ -65,6 +72,29 @@ body {
   font-size: 16px;
   letter-spacing: 2px;
   cursor: pointer;
+  user-select: none; }
+
+.title {
+  min-height: 25px;
+  max-height: 50px;
+  overflow: auto;
+  line-height: 25px;
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 25px;
+  border-bottom: 1px solid grey; }
+
+.delete-todo {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  font-size: 28px;
+  text-align: center;
+  margin-right: 5px;
+  cursor: pointer;
+  border-radius: 50%;
+  order: 3;
+  transition: .2s ease;
   user-select: none; }
 .todo-list {
   margin: 0;
@@ -131,7 +161,7 @@ body {
 .edit {
   width: 20px;
   height: 20px;
-  background-image: url(.//images/8057ec3282dfc9683a737a8f089956be.svg);
+  background-image: url(.//images/a954e2027937b9975d42bb056b240abb.svg);
   background-size: cover;
   order: 2;
   cursor: pointer;
