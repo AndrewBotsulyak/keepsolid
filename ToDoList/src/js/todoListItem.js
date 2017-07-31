@@ -1,3 +1,21 @@
+function createItemElement(){
+	const li = document.createElement('li');
+	li.classList.add('todo-list--item');
+
+	li.innerHTML = `
+		<label class='check-label'>
+			<input type="checkbox" class='check' />
+		</label>
+		<div class="edit-input" contenteditable="false" ></div>
+		<div class="edit"></div>
+		<div class="delete">×</div>
+	`;
+	
+	return li;
+}
+
+export { createItemElement };
+
 /**
  * Class represents TodoListItem.
  * @param {HTMLElement} item - DOM Element (<li>).
@@ -16,6 +34,7 @@ export default class TodoListItem{
 		this.delete = this.itemElem.querySelector('.delete');
 		this.check = this.itemElem.querySelector('.check');
 		this.editElem = this.itemElem.querySelector('.edit'); 
+		this.labelElem = this.itemElem.querySelector('.check-label');
 
 		this.parent = (() => {
 			let todo = this.itemElem.parentElement;
@@ -76,9 +95,11 @@ export default class TodoListItem{
 		if(this.isChecked()){
 			this.input.style.textDecoration = 'line-through';
 			this.setEditable(false);
+			this.labelElem.classList.add('check-label-active');
 		}
 		else{
 			this.input.style.textDecoration = 'none';
+			this.labelElem.classList.remove('check-label-active');			
 		}
 
 		this.setState({checked: this.isChecked()});
@@ -95,9 +116,11 @@ export default class TodoListItem{
 		if(bool){
 			this.input.style.textDecoration = 'line-through';
 			this.setEditable(false);
+			this.labelElem.classList.add('check-label-active');
 		}
 		else{
 			this.input.style.textDecoration = 'none';
+			this.labelElem.classList.remove('check-label-active');
 		}
 	}
 
@@ -170,17 +193,4 @@ export default class TodoListItem{
 		this.input.textContent = text;
 	}
 
-	static createElement() {
-		const li = document.createElement('li');
-		li.classList.add('todo-list--item');
-
-		li.innerHTML = `
-			<input type="checkbox" class='check' />
-			<div class="edit-input" contenteditable="false" ></div>
-			<div class="edit"></div>
-			<div class="delete">×</div>
-		`;
-		
-		return li;
-	}
 }

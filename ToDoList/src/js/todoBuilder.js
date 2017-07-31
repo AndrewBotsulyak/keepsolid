@@ -1,4 +1,5 @@
 import TodoList from './todoList.js';
+import { createTodoElement } from './todoList';
 
 /**
  * class create all TodoLists
@@ -31,7 +32,7 @@ export default class TodoBuilder{
 	}
 
 	updateStorage(){
-		debugger;
+
 		this.state.todosArr.forEach((todo, index) => {
 			todo.arrItems = this.todosArr[index].arrItems.map(el => {
 				return el.state;
@@ -63,7 +64,7 @@ export default class TodoBuilder{
 	 * @return {TodoList} just created.
 	 */
 	createTodo(){
-		let todoElem = this.containerElem.appendChild(TodoList.createElement()); 
+		let todoElem = this.containerElem.appendChild(createTodoElement()); 
 		const todo = new TodoList(todoElem);			 
 		todo.createFromStorage();
 		this.todosArr.push(todo);
@@ -77,9 +78,8 @@ export default class TodoBuilder{
 	createTodoFromStorage(){
 		let state = JSON.parse(localStorage.getItem('todos'));
 		this.state = state;
-
 		this.state.todosArr.forEach(el => {
-			let todoElem = this.containerElem.appendChild(TodoList.createElement()); 
+			let todoElem = this.containerElem.appendChild(createTodoElement()); 
 			const todo = new TodoList(todoElem, el.title, el.arrItems);			 
 			todo.createFromStorage();
 			this.todosArr.push(todo);

@@ -1,4 +1,36 @@
 import TodoListItem from './todoListItem.js';
+import { createItemElement } from './todoListItem';
+
+const PLACEHOLDER_TITLE = 'Тема заметок...';
+const PLACEHOLDER_INPUT = 'Заметка...'
+
+function createTodoElement(){
+	const div = document.createElement('div');
+	div.classList.add('todo');
+	div.innerHTML = `
+		<form action="" class="todo-form">
+			<div class="delete-todo">×</div>
+			<div class='wrap-title-input input' tabindex='1'>		
+				<input type='text' class='title' />
+				<label class='title-label'>${PLACEHOLDER_TITLE}</label>			
+			</div>
+			<div class='wrap-main-input input'>
+				<input type='text' class='main-input' />
+				<label class='main-input-label'>${PLACEHOLDER_INPUT}</label>
+			</div>
+			<input type="submit" class="add-item btn mat-elevation-2dp" value="Add" />
+			<button type='button' class="clearAll btn mat-elevation-2dp">Clear</button>
+		</form>
+		<ul class="todo-list">
+		</ul>
+	`;
+
+	return div;
+}
+
+export { createTodoElement };
+
+
 
 /**
  * Class represents TodoList.
@@ -21,14 +53,19 @@ export default class TodoList{
 		this.clearList = this.todoElem.querySelector('.clearAll');
 		this.titleElem = this.todoElem.querySelector('.title');
 		this.deleteTodo = this.todoElem.querySelector('.delete-todo');
+		this.wrapInput = this.todoElem.querySelector('.wrap-title-input');
+		this.labelMain =  this.todoElem.querySelector('.main-input-label');
+		this.wrapMainInput = this.todoElem.querySelector('.wrap-main-input');
+		this.label = this.todoElem.querySelector('.title-label');
 
-		this.titleElem.textContent = title;
+		this.setTitle(title);		
+		
 		this.title = title;
 		this.arrItems = [];
 
 		this.parent = (() => {
 			let build = this.todoElem.parentElement;
-			while(!build.classList.contains('todo-container')){
+			while(!build.classList.contains('content-canvas')){
 				build = build.parentElement;
 			}
 			return build;
@@ -41,7 +78,24 @@ export default class TodoList{
 		
 		this.deleteTodo.addEventListener('click', (event) => this.onRemove(event));
 
-		this.titleElem.addEventListener('keyup', (event) => this.onType(event));			
+		this.titleElem.addEventListener('keyup', (event) => this.onType(event));
+
+		this.wrapInput.addEventListener('click', (event) => {
+			if(event.target == this.titleElem || event.target == this.label){
+				if(!this.title){
+					this.titleElem.focus();								// focus title
+					this.animLabel(true, 'label');						// add effects for label
+					this.wrapInput.classList.add('input-line'); 		// border effect
+				}
+			}
+		});
+
+		this.titleElem.addEventListener('focusout', (event) => {
+			if(!this.title){
+				this.animLabel(false, 'label');								// reverse label effect 
+			}
+			this.wrapInput.classList.remove('input-line');			// remove border effect
+		});			
 
 		//	subscribe on TodoListItem's 'closeItem' event
 		this.ul.addEventListener('closeItem', (event) => this.onDeleteItem(event));  
@@ -50,6 +104,42 @@ export default class TodoList{
 		
 		this.clearList.addEventListener('click', (event) => this.clearAll(event));
 
+
+		this.wrapMainInput.addEventListener('click', (event) => {
+			if(event.target == this.labelMain || event.target == this.input){
+				if(!this.input.value){
+					this.input.focus();						
+					this.animLabel(true, 'labelMain');						
+					this.wrapMainInput.classList.add('input-line'); 		
+				}
+			}
+		});
+
+		this.input.addEventListener('focusout', (event) => {
+			if(!this.input.value){
+				this.animLabel(false, 'labelMain');								 
+			}
+			this.wrapMainInput.classList.remove('input-line');			
+		});	
+
+
+	}
+
+	setTitle(text){
+		if(text){
+			this.animLabel(true, 'label');
+			this.titleElem.value = text;
+			this.title = text;
+		}
+	}
+
+	animLabel(bool, elem){
+		if(bool){
+			this[elem].classList.add('label-move');
+		}
+		else{
+			this[elem].classList.remove('label-move');
+		}
 	}
 
 	setState(newState){
@@ -70,7 +160,7 @@ export default class TodoList{
 	}
 
 	onType(event){
-		this.title = this.titleElem.textContent;
+		this.title = this.titleElem.value;
 		this.setState({ title: this.title });
 	}
 
@@ -87,7 +177,7 @@ export default class TodoList{
 
 	createFromStorage() {
 		this.state.arrItems.forEach(el => {
-			const newElem = this.ul.appendChild(TodoListItem.createElement());
+			const newElem = this.ul.appendChild(createItemElement());
 			const objItem =  new TodoListItem(newElem, el.checked, el.content);
 			this.arrItems.push(objItem);
 		});
@@ -96,16 +186,15 @@ export default class TodoList{
 	onAddItem(event) {
 		event.preventDefault();
 		if(!this.isInputEmpty()){
-			debugger;
-			const newElem = this.ul.appendChild(TodoListItem.createElement());
-			const objItem =  new TodoListItem(newElem, null, this.input.textContent);
+			const newElem = this.ul.appendChild(createItemElement());
+			const objItem =  new TodoListItem(newElem, null, this.input.value);
 			this.arrItems.push(objItem);
 			this.setState({ arrItems: this.arrItems.map(el => el.state)});
 		}
 	}
 
 	isInputEmpty() {
-		return (this.input.textContent) ? false : true;
+		return (this.input.value) ? false : true;
 	}
 
 	/**
@@ -132,24 +221,6 @@ export default class TodoList{
 
 			this.setState({ arrItems: [] });
 		}
-	}
-
-	static createElement(){
-		const div = document.createElement('div');
-		div.classList.add('todo');
-		div.innerHTML = `
-			<form action="" class="todo-form">
-				<div class="delete-todo">×</div>
-				<div class='title' contenteditable="true"></div>
-				<div class='main-input' contenteditable="true" ></div>
-				<input type="submit" class="add-item btn" value="Add" />
-				<div class="clearAll btn">Clear</div>
-			</form>
-			<ul class="todo-list">
-			</ul>
-		`;
-
-		return div;
 	}
 
 }

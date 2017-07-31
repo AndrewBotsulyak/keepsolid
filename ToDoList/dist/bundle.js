@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "./";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -79,9 +79,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _todoList = __webpack_require__(4);
+var _todoList = __webpack_require__(7);
 
 var _todoList2 = _interopRequireDefault(_todoList);
+
+var _todoList3 = __webpack_require__(7);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -127,7 +129,6 @@ var TodoBuilder = function () {
 		value: function updateStorage() {
 			var _this2 = this;
 
-			debugger;
 			this.state.todosArr.forEach(function (todo, index) {
 				todo.arrItems = _this2.todosArr[index].arrItems.map(function (el) {
 					return el.state;
@@ -169,7 +170,7 @@ var TodoBuilder = function () {
 	}, {
 		key: 'createTodo',
 		value: function createTodo() {
-			var todoElem = this.containerElem.appendChild(_todoList2.default.createElement());
+			var todoElem = this.containerElem.appendChild((0, _todoList3.createTodoElement)());
 			var todo = new _todoList2.default(todoElem);
 			todo.createFromStorage();
 			this.todosArr.push(todo);
@@ -186,9 +187,8 @@ var TodoBuilder = function () {
 
 			var state = JSON.parse(localStorage.getItem('todos'));
 			this.state = state;
-
 			this.state.todosArr.forEach(function (el) {
-				var todoElem = _this3.containerElem.appendChild(_todoList2.default.createElement());
+				var todoElem = _this3.containerElem.appendChild((0, _todoList3.createTodoElement)());
 				var todo = new _todoList2.default(todoElem, el.title, el.arrItems);
 				todo.createFromStorage();
 				_this3.todosArr.push(todo);
@@ -241,6 +241,24 @@ exports.default = TodoBuilder;
 
 /***/ }),
 /* 4 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -249,16 +267,32 @@ exports.default = TodoBuilder;
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+exports.createTodoElement = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _todoListItem = __webpack_require__(5);
+var _todoListItem = __webpack_require__(8);
 
 var _todoListItem2 = _interopRequireDefault(_todoListItem);
+
+var _todoListItem3 = __webpack_require__(8);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var PLACEHOLDER_TITLE = 'Тема заметок...';
+var PLACEHOLDER_INPUT = 'Заметка...';
+
+function createTodoElement() {
+	var div = document.createElement('div');
+	div.classList.add('todo');
+	div.innerHTML = '\n\t\t<form action="" class="todo-form">\n\t\t\t<div class="delete-todo">\xD7</div>\n\t\t\t<div class=\'wrap-title-input input\' tabindex=\'1\'>\t\t\n\t\t\t\t<input type=\'text\' class=\'title\' />\n\t\t\t\t<label class=\'title-label\'>' + PLACEHOLDER_TITLE + '</label>\t\t\t\n\t\t\t</div>\n\t\t\t<div class=\'wrap-main-input input\'>\n\t\t\t\t<input type=\'text\' class=\'main-input\' />\n\t\t\t\t<label class=\'main-input-label\'>' + PLACEHOLDER_INPUT + '</label>\n\t\t\t</div>\n\t\t\t<input type="submit" class="add-item btn mat-elevation-2dp" value="Add" />\n\t\t\t<button type=\'button\' class="clearAll btn mat-elevation-2dp">Clear</button>\n\t\t</form>\n\t\t<ul class="todo-list">\n\t\t</ul>\n\t';
+
+	return div;
+}
+
+exports.createTodoElement = createTodoElement;
 
 /**
  * Class represents TodoList.
@@ -270,6 +304,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {HTMLElement} ul - container of TodoListItems (<li>).
  * @property {Array} arrItems - array with TodoListItems. 
  */
+
 var TodoList = function () {
 	function TodoList() {
 		var todo = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -288,14 +323,19 @@ var TodoList = function () {
 		this.clearList = this.todoElem.querySelector('.clearAll');
 		this.titleElem = this.todoElem.querySelector('.title');
 		this.deleteTodo = this.todoElem.querySelector('.delete-todo');
+		this.wrapInput = this.todoElem.querySelector('.wrap-title-input');
+		this.labelMain = this.todoElem.querySelector('.main-input-label');
+		this.wrapMainInput = this.todoElem.querySelector('.wrap-main-input');
+		this.label = this.todoElem.querySelector('.title-label');
 
-		this.titleElem.textContent = title;
+		this.setTitle(title);
+
 		this.title = title;
 		this.arrItems = [];
 
 		this.parent = function () {
 			var build = _this.todoElem.parentElement;
-			while (!build.classList.contains('todo-container')) {
+			while (!build.classList.contains('content-canvas')) {
 				build = build.parentElement;
 			}
 			return build;
@@ -314,6 +354,23 @@ var TodoList = function () {
 			return _this.onType(event);
 		});
 
+		this.wrapInput.addEventListener('click', function (event) {
+			if (event.target == _this.titleElem || event.target == _this.label) {
+				if (!_this.title) {
+					_this.titleElem.focus(); // focus title
+					_this.animLabel(true, 'label'); // add effects for label
+					_this.wrapInput.classList.add('input-line'); // border effect
+				}
+			}
+		});
+
+		this.titleElem.addEventListener('focusout', function (event) {
+			if (!_this.title) {
+				_this.animLabel(false, 'label'); // reverse label effect 
+			}
+			_this.wrapInput.classList.remove('input-line'); // remove border effect
+		});
+
 		//	subscribe on TodoListItem's 'closeItem' event
 		this.ul.addEventListener('closeItem', function (event) {
 			return _this.onDeleteItem(event);
@@ -326,9 +383,44 @@ var TodoList = function () {
 		this.clearList.addEventListener('click', function (event) {
 			return _this.clearAll(event);
 		});
+
+		this.wrapMainInput.addEventListener('click', function (event) {
+			if (event.target == _this.labelMain || event.target == _this.input) {
+				if (!_this.input.value) {
+					_this.input.focus();
+					_this.animLabel(true, 'labelMain');
+					_this.wrapMainInput.classList.add('input-line');
+				}
+			}
+		});
+
+		this.input.addEventListener('focusout', function (event) {
+			if (!_this.input.value) {
+				_this.animLabel(false, 'labelMain');
+			}
+			_this.wrapMainInput.classList.remove('input-line');
+		});
 	}
 
 	_createClass(TodoList, [{
+		key: 'setTitle',
+		value: function setTitle(text) {
+			if (text) {
+				this.animLabel(true, 'label');
+				this.titleElem.value = text;
+				this.title = text;
+			}
+		}
+	}, {
+		key: 'animLabel',
+		value: function animLabel(bool, elem) {
+			if (bool) {
+				this[elem].classList.add('label-move');
+			} else {
+				this[elem].classList.remove('label-move');
+			}
+		}
+	}, {
 		key: 'setState',
 		value: function setState(newState) {
 			this.state = Object.assign({}, this.state, newState);
@@ -350,7 +442,7 @@ var TodoList = function () {
 	}, {
 		key: 'onType',
 		value: function onType(event) {
-			this.title = this.titleElem.textContent;
+			this.title = this.titleElem.value;
 			this.setState({ title: this.title });
 		}
 	}, {
@@ -371,7 +463,7 @@ var TodoList = function () {
 			var _this2 = this;
 
 			this.state.arrItems.forEach(function (el) {
-				var newElem = _this2.ul.appendChild(_todoListItem2.default.createElement());
+				var newElem = _this2.ul.appendChild((0, _todoListItem3.createItemElement)());
 				var objItem = new _todoListItem2.default(newElem, el.checked, el.content);
 				_this2.arrItems.push(objItem);
 			});
@@ -381,9 +473,8 @@ var TodoList = function () {
 		value: function onAddItem(event) {
 			event.preventDefault();
 			if (!this.isInputEmpty()) {
-				debugger;
-				var newElem = this.ul.appendChild(_todoListItem2.default.createElement());
-				var objItem = new _todoListItem2.default(newElem, null, this.input.textContent);
+				var newElem = this.ul.appendChild((0, _todoListItem3.createItemElement)());
+				var objItem = new _todoListItem2.default(newElem, null, this.input.value);
 				this.arrItems.push(objItem);
 				this.setState({ arrItems: this.arrItems.map(function (el) {
 						return el.state;
@@ -393,7 +484,7 @@ var TodoList = function () {
 	}, {
 		key: 'isInputEmpty',
 		value: function isInputEmpty() {
-			return this.input.textContent ? false : true;
+			return this.input.value ? false : true;
 		}
 
 		/**
@@ -434,15 +525,6 @@ var TodoList = function () {
 				this.setState({ arrItems: [] });
 			}
 		}
-	}], [{
-		key: 'createElement',
-		value: function createElement() {
-			var div = document.createElement('div');
-			div.classList.add('todo');
-			div.innerHTML = '\n\t\t\t<form action="" class="todo-form">\n\t\t\t\t<div class="delete-todo">\xD7</div>\n\t\t\t\t<div class=\'title\' contenteditable="true"></div>\n\t\t\t\t<div class=\'main-input\' contenteditable="true" ></div>\n\t\t\t\t<input type="submit" class="add-item btn" value="Add" />\n\t\t\t\t<div class="clearAll btn">Clear</div>\n\t\t\t</form>\n\t\t\t<ul class="todo-list">\n\t\t\t</ul>\n\t\t';
-
-			return div;
-		}
 	}]);
 
 	return TodoList;
@@ -451,7 +533,7 @@ var TodoList = function () {
 exports.default = TodoList;
 
 /***/ }),
-/* 5 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -465,6 +547,17 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function createItemElement() {
+	var li = document.createElement('li');
+	li.classList.add('todo-list--item');
+
+	li.innerHTML = '\n\t\t<label class=\'check-label\'>\n\t\t\t<input type="checkbox" class=\'check\' />\n\t\t</label>\n\t\t<div class="edit-input" contenteditable="false" ></div>\n\t\t<div class="edit"></div>\n\t\t<div class="delete">\xD7</div>\n\t';
+
+	return li;
+}
+
+exports.createItemElement = createItemElement;
+
 /**
  * Class represents TodoListItem.
  * @param {HTMLElement} item - DOM Element (<li>).
@@ -474,6 +567,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {HTMLElement} check - checkbox inside <li>.
  * @property {HTMLElement} editElem -  btn for edit input
  */
+
 var TodoListItem = function () {
 	function TodoListItem() {
 		var item = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -490,6 +584,7 @@ var TodoListItem = function () {
 		this.delete = this.itemElem.querySelector('.delete');
 		this.check = this.itemElem.querySelector('.check');
 		this.editElem = this.itemElem.querySelector('.edit');
+		this.labelElem = this.itemElem.querySelector('.check-label');
 
 		this.parent = function () {
 			var todo = _this.itemElem.parentElement;
@@ -562,8 +657,10 @@ var TodoListItem = function () {
 			if (this.isChecked()) {
 				this.input.style.textDecoration = 'line-through';
 				this.setEditable(false);
+				this.labelElem.classList.add('check-label-active');
 			} else {
 				this.input.style.textDecoration = 'none';
+				this.labelElem.classList.remove('check-label-active');
 			}
 
 			this.setState({ checked: this.isChecked() });
@@ -580,8 +677,10 @@ var TodoListItem = function () {
 			if (bool) {
 				this.input.style.textDecoration = 'line-through';
 				this.setEditable(false);
+				this.labelElem.classList.add('check-label-active');
 			} else {
 				this.input.style.textDecoration = 'none';
+				this.labelElem.classList.remove('check-label-active');
 			}
 		}
 	}, {
@@ -670,16 +769,6 @@ var TodoListItem = function () {
 
 			this.input.textContent = text;
 		}
-	}], [{
-		key: 'createElement',
-		value: function createElement() {
-			var li = document.createElement('li');
-			li.classList.add('todo-list--item');
-
-			li.innerHTML = '\n\t\t\t<input type="checkbox" class=\'check\' />\n\t\t\t<div class="edit-input" contenteditable="false" ></div>\n\t\t\t<div class="edit"></div>\n\t\t\t<div class="delete">\xD7</div>\n\t\t';
-
-			return li;
-		}
 	}]);
 
 	return TodoListItem;
@@ -688,17 +777,23 @@ var TodoListItem = function () {
 exports.default = TodoListItem;
 
 /***/ }),
-/* 6 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
+__webpack_require__(1);
+
+__webpack_require__(5);
+
+__webpack_require__(4);
+
 __webpack_require__(3);
 
-__webpack_require__(2);
+__webpack_require__(6);
 
-__webpack_require__(1);
+__webpack_require__(2);
 
 var _todoBuilder = __webpack_require__(0);
 
@@ -706,13 +801,19 @@ var _todoBuilder2 = _interopRequireDefault(_todoBuilder);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var container = document.querySelector('.todo-container');
+var container = document.querySelector('.content-canvas');
 
 var build = new _todoBuilder2.default(container);
-if (build.hasLocalStorage()) {
-   build.createTodoFromStorage();
-} else {
-   build.createTodo();
+start();
+
+async function start() {
+    if (build.hasLocalStorage()) {
+        await build.createTodoFromStorage();
+    } else {
+        await build.createTodo();
+    }
+    var pl = document.querySelector('.todo-placeholder');
+    console.log(pl);
 }
 
 /***/ })

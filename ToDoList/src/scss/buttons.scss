@@ -1,0 +1,64 @@
+@import './vars.scss';
+@import './shadows.scss';
+
+.btn{
+	height: 36px;
+	min-width: 88px;
+	padding: 0 16px;
+	margin: 8px 0;
+	font-family: "Roboto-medium";
+	border: none;
+	border-radius: 2px;
+	box-sizing: border-box;
+	text-align: center;
+	line-height: 36px;
+	font-size: 14px;
+	text-transform: uppercase;
+	cursor: pointer;
+	user-select: none;
+	background-color: $secondColor;
+	color: black;
+	outline: none;
+	
+	&:hover{
+		background-color: darken( $secondColor, 5%);
+	}
+
+	&:active{
+		@extend .mat-elevation-6dp;
+	}
+
+}
+
+.build-todo{
+    position: fixed;
+    bottom:35px;
+    right: 35px;
+    width: 56px;
+    height: 56px;
+	border-radius: 50%;
+	border: none;
+	background-color: $mainColor;
+	outline: none;
+    cursor: pointer;
+    z-index: 1;
+    @extend .mat-elevation-6dp;
+
+    &:hover{
+        background-color: darken( $mainColor, 5%);
+    }
+
+    &:active{
+        @extend .mat-elevation-12dp;
+    }
+}
+
+.floating-btn-add{
+    width: 19px;
+    height: 19px;
+    margin: auto;
+    box-sizing: border-box;
+    background-image: url('./img/add.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
